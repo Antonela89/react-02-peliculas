@@ -1,12 +1,15 @@
 import './App.css';
-import Api from './components/Api.jsx';
+import Contenedor from './components/Contenedor.jsx';
+import Paginacion from './components/Paginacion.jsx'
 
 function App() {
   return (
     <div className="App">
-      <Api/>
+      <Contenedor/>
+      <Paginacion/>
     </div>
   );
 }
 
 export default App;
+
