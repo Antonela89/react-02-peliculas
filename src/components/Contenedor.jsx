@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
 import Card from './Card';
+import Paginacion from './Paginacion';
 
 const Contenedor = () => {
 
-    let pagina = 1; //pagina inicial
+    const [pagina, setPagina] = useState(1) //pagina inicial
     const [peliculas, setPeliculas] = useState([]);
 
     useEffect(()=> {
         //estructura encargada de hacer asincronismo: funcion anónima
         const cargarPeliculas = async () => {
             try {
-                const respuesta = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=191528030c357419329af1198edbcb24&language=es-MX&page=1`);
-                console.log(respuesta);
+                const respuesta = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=191528030c357419329af1198edbcb24&language=es-MX&page=${pagina}`);
+                //console.log(respuesta);
 
-                if (!respuesta.status === 200) { 
+                if (!respuesta.ok) { 
                     throw new Error('Error en la solicitud');
                 }
                 const datos = await respuesta.json();
-                console.log(datos);
+                //console.log(datos);
+                //console.log(datos.page)
+                //console.log(datos.total_pages)
                 setPeliculas(datos.results);
+                setPagina(datos.page);
             }
             catch (error) {
         console.log(error.message);
@@ -27,9 +31,18 @@ const Contenedor = () => {
 
 //llamada de funcion para asincronismo
 cargarPeliculas()
-    }, [])
+    }, [pagina])
 
-    console.log({peliculas})
+    const cambiarPagina = (direccion) => {
+        if (direccion === 'anterior' && pagina > 1) {
+            setPagina(pagina - 1);
+
+        } else if (direccion === 'siguiente' && pagina < 1000) {
+            setPagina(pagina + 1);
+        }
+    }
+
+    //console.log({peliculas})
 
     return (
         <div style = {{width:'100%'}}>
@@ -38,7 +51,7 @@ cargarPeliculas()
                 {/* como el array viene vacio no toma el metodo map - solucion renderizado condicional con un operador ternario */}
                 {peliculas.length > 0 ? (
                     peliculas.map(pelicula => (
-                        <li style={{flex:'1'}} className='m-3' key={pelicula.id}>
+                        <li style={{flex:'1'}} className='m-1' key={pelicula.id}>
                             <Card pelicula = {pelicula}/>
                         </li>
                     ))
@@ -47,6 +60,7 @@ cargarPeliculas()
                 )
                 }
             </ul>
+            <Paginacion cambiarPagina={cambiarPagina}/>
         </div>
     )
 }
